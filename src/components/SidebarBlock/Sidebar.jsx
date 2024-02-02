@@ -90,9 +90,10 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
 
   const chooseCity = (city) => {
     setIsLocAppeared(true);
-    setIsLoading(true);
+    
     getCity(city)
       .then((data) => {
+        setIsLoading(true);
         getWeather(data.lat, data.lon)
           .then((data) => {
             setWeatherData(data);
