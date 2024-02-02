@@ -18,7 +18,6 @@ export const App = () => {
         <WeatherContext.Provider value={{ weatherData, setWeatherData }}>
           <Sidebar isLoading={isLoading} setIsLoading={setIsLoading} />
           <S.Data>
-            <p>Hello</p>
             <TopMainPanel isLoading={isLoading} setIsLoading={setIsLoading} />
             <LowMainPanel isLoading={isLoading} setIsLoading={setIsLoading} />
           </S.Data>
