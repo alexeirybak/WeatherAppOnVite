@@ -8,10 +8,11 @@ import * as S from './lowMainPanel.styled';
 export const LowMainPanel = ({ isLoading }) => {
   const { weatherData } = useContext(WeatherContext);
   let [widthIndicate, setWidthIndicate] = useState('50%');
+  console.log(weatherData);
 
   const windSpeed = Math.round(weatherData?.wind?.speed) || 0;
   const humidity = weatherData?.main?.humidity || 50;
-  const preVisibility = weatherData.visibility || 0;
+  const preVisibility = weatherData?.visibility || 0;
   let visibility;
 
   if (preVisibility >= 10000) {
