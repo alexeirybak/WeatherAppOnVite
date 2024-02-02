@@ -26,7 +26,7 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
   const [message, setMessage] = useState('');
   let [city, setCity] = useState('Москва');
   let [citiesArray, setCitiesArray] = useState(
-    JSON.parse(localStorage.getItem('citiesArray')) || [],
+    JSON.parse(localStorage.getItem('citiesArray')) || []
   );
   const { weatherData, setWeatherData } = useContext(WeatherContext);
 
@@ -90,6 +90,7 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
 
   const chooseCity = (city) => {
     setIsLocAppeared(true);
+    setIsLoading(true);
     getCity(city)
       .then((data) => {
         getWeather(data.lat, data.lon)
@@ -192,7 +193,6 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
                   type='search'
                   placeholder='Введите город'
                   id='cityInput'
-                  pattern='^[?!,.-а-яА-ЯёЁ\s]+$'
                   onKeyDown={handleKeyDown}
                   onInput={handleInput}
                 />

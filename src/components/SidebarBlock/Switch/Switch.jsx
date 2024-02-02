@@ -31,12 +31,12 @@ export const Switch = () => {
     <S.LabelBtnSwitch>
       <S.Input
         type='checkbox'
+        id='themeSwitch'
         aria-label='Переключить на дневную / ночную тему'
         checked={currentTheme === 'dark'}
         onChange={changeTheme}
       />
       <S.SwitchBlock
-        htmlFor='switcher'
         $currentTheme={currentTheme}
         $lightTheme={currentTheme === 'light'}
       >
