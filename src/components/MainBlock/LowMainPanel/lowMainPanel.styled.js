@@ -26,7 +26,7 @@ export const DataPanelForecast = styled.h2`
 `;
 
 export const DataDetailsBlock = styled.div`
-  width: 25vw;
+  
   min-width: 320px;
   height: 180px;
   border-radius: 10px;

@@ -1,14 +1,12 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Loader } from '../../../utils/Loader';
-import { WeatherContext } from '../../../App';
 import { getWindDirection } from '../../../utils/getWindDirection';
 import windDir from './wind-direction.svg';
 import * as S from './lowMainPanel.styled';
 
 export const LowMainPanel = ({ isLoading }) => {
-  const { weatherData } = useContext(WeatherContext);
-  let [widthIndicate, setWidthIndicate] = useState('50%');
-
+  const weatherData = useSelector((state) => state.weather.weatherData);
   const windSpeed = Math.round(weatherData?.wind?.speed) || 0;
   const humidity = weatherData?.main?.humidity || 50;
   const preVisibility = weatherData?.visibility || 0;
@@ -23,23 +21,6 @@ export const LowMainPanel = ({ isLoading }) => {
   const pressure = Math.round(weatherData?.main?.pressure * 0.750062) || 0;
   let deg = +weatherData?.wind?.deg;
   let direction = getWindDirection(deg) || 0;
-
-  useEffect(() => {
-    const calcWidth = () => {
-      let newWidthBlockIndicate =
-        document.getElementById('parentElement').offsetWidth;
-
-      setWidthIndicate((humidity * newWidthBlockIndicate) / 100);
-    };
-
-    calcWidth();
-
-    window.addEventListener('resize', calcWidth);
-
-    return () => {
-      window.removeEventListener('resize', calcWidth);
-    };
-  }, [humidity]);
 
   return (
     <S.DataDetails>
@@ -93,7 +74,7 @@ export const LowMainPanel = ({ isLoading }) => {
               </S.HumidityScaleMarkers>
               <S.HumidityScaleImagine id='parentElement'>
                 <S.HumidityScaleIndicate
-                  style={{ width: `${widthIndicate}px` }}
+                  style={{ width: `${humidity}%` }}
                 ></S.HumidityScaleIndicate>
               </S.HumidityScaleImagine>
               <S.HumidityScaleHundred>%</S.HumidityScaleHundred>

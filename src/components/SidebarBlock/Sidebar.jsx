@@ -1,11 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setWeatherData } from '../../store/weatherSlice';
 import { Switch } from './Switch/Switch';
 import { Loader } from '../../utils/Loader';
 import { getWeather } from '../ApiBlock/apiGetData';
 import { getCity } from '../ApiBlock/apiGetCity';
 import { formatCityName } from '../../utils/formatCityName';
 import { getCurrentDate } from '../../utils/timeFormatter';
-import { WeatherContext } from '../../App';
 import searcher from './searcher.svg';
 import location from './location.svg';
 import * as S from './sidebar.styled';
@@ -22,13 +23,14 @@ if (isNight || localStorage.getItem('theme') === 'dark') {
 }
 
 export const Sidebar = ({ isLoading, setIsLoading }) => {
+  const dispatch = useDispatch();
+  const weatherData = useSelector((state) => state.weather.weatherData);
   const [isLocAppeared, setIsLocAppeared] = useState(false);
   const [message, setMessage] = useState('');
   let [city, setCity] = useState('Москва');
   let [citiesArray, setCitiesArray] = useState(
     JSON.parse(localStorage.getItem('citiesArray')) || []
   );
-  const { weatherData, setWeatherData } = useContext(WeatherContext);
 
   const findCity = () => {
     const cityInput = document.getElementById('cityInput').value.trim();
@@ -55,19 +57,21 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('citiesArray')) {
-      const citiesArray = JSON.parse(localStorage.getItem('citiesArray'));
-      const lastCity = citiesArray[citiesArray.length - 1];
-      getCity(lastCity).then((data) => {
-        getWeather(data.lat, data.lon)
-          .then((data) => {
-            setWeatherData(data);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      });
-    }
+    const fetchWeatherData = async () => {
+      try {
+        const citiesArray = JSON.parse(localStorage.getItem('citiesArray'));
+        if (citiesArray && citiesArray.length > 0) {
+          const lastCity = citiesArray[citiesArray.length - 1];
+          const cityData = await getCity(lastCity);
+          const weatherData = await getWeather(cityData.lat, cityData.lon);
+          dispatch(setWeatherData(weatherData));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchWeatherData();
   }, []);
 
   useEffect(() => {
@@ -79,7 +83,6 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
   const sideShow = () => {
     setMessage('');
     setIsLocAppeared(!isLocAppeared);
-    document.getElementById('cityInput').value = '';
   };
 
   const handleKeyDown = (event) => {
@@ -88,33 +91,25 @@ export const Sidebar = ({ isLoading, setIsLoading }) => {
     }
   };
 
-  const chooseCity = (city) => {
+  const chooseCity = async (city) => {
     setIsLocAppeared(true);
-    
-    getCity(city)
-      .then((data) => {
-        setIsLoading(true);
-        getWeather(data.lat, data.lon)
-          .then((data) => {
-            setWeatherData(data);
-            setCitiesArray((citiesArray) => [...citiesArray, city]);
-            localStorage.setItem('citiesArray', JSON.stringify(citiesArray));
-            setIsLoading(false);
-            setIsLocAppeared(false);
-          })
-          .catch((error) => {
-            setMessage(error.message);
-            setIsLoading(false);
-            setIsLocAppeared(true);
-          });
-      })
-      .catch((error) => {
-        setMessage(error.message);
-        setIsLoading(false);
-        setIsLocAppeared(true);
-      });
-    sideShow();
-    setCity(city);
+    setIsLoading(true);
+    setMessage('');
+
+    try {
+      const cityData = await getCity(city);
+      const weatherData = await getWeather(cityData.lat, cityData.lon);
+      dispatch(setWeatherData(weatherData));
+      setCitiesArray((citiesArray) => [...citiesArray, city]);
+      localStorage.setItem('citiesArray', JSON.stringify(citiesArray));
+      setCity(city);
+    } catch (error) {
+      setMessage(error.message);
+    } finally {
+      setIsLoading(false);
+      setIsLocAppeared(false);
+      sideShow();
+    }
   };
 
   let stack = [];

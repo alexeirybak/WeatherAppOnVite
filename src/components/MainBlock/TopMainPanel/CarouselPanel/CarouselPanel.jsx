@@ -1,6 +1,6 @@
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useSelector } from "react-redux";
 import { Loader } from '../../../../utils/Loader';
-import { WeatherContext } from '../../../../App';
 import { getForecast } from '../../../ApiBlock/apiGetData';
 import { processWeatherData } from '../../../../utils/processWeatherData';
 import { dummyDaily, dummyHourly } from '../../../../utils/mocData';
@@ -11,10 +11,10 @@ import * as S from './CarouselPanel.styled';
 export const CarouselPanel = ({ isWeek, isLoading }) => {
   const [elementsRowHours, setElementsRowHours] = useState(0);
   const [elementsRowDays, setElementsRowDays] = useState(0);
-  const { weatherData } = useContext(WeatherContext);
   const [forecast, setForecast] = useState('');
   const [currentHourIndex, setCurrentHourIndex] = useState(0);
   const [currentDayIndex, setCurrentDayIndex] = useState(0);
+  const weatherData = useSelector((state) => state.weather.weatherData);
 
   const handleNextHour = () => {
     setCurrentHourIndex((prevIndex) => prevIndex + 1);
